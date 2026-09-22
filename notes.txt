@@ -1,0 +1,88 @@
+Application Configuration
+> Configuration is information that controls how the application runs, rather than the application's actual business logic.
+
+Needed configs
+
+Server address
+Database URL
+Session secret
+Environment
+Log level
+
+Assume 
+Development → :8080
+Testing     → :8081
+Production  → :80
+
+Conceptually
+
+                  KDocs
+                    │
+             Configuration
+                    │
+        ┌───────────┼───────────┐
+        ↓           ↓           ↓
+     Server       Database     Auth
+      :8080       PostgreSQL   secret
+
+
+>Code tells the application what to do. Configuration tells it how/where to do it.
+
+Where should configuration come from?
+Approaches
+1. Hardcoded
+Addr: ":8080"
+-simple but inflexible
+
+2. Configuration File
+server:
+  address: ":8080"
+-Useful in some applications, but introduces another file format and configuration mechanism.
+
+3. Environment variables
+KDOCS_ADDR=:8080
+then Go reads the value
+-use environment variables for runtime configuration.- a very common approach for web applications and will become especially useful when we have PostgreSQL and authentication.
+
+export KDOCS_ADDR=:8081
+
+in Go
+os.Getenv("KDOCS_ADDR")
+
+Terminal / OS
+      │
+      │ KDOCS_ADDR=:8081
+      ↓
+   KDocs
+      │
+      ↓
+ HTTP server listens on :8081
+
+ on windows
+ $env:KDOCS_ADDR=":8081"
+
+ challehe with os.Getenv gets messy over time when we have
+    os.Getenv("KDOCS_ADDR")
+    os.Getenv("KDOCS_DATABASE_URL")
+    os.Getenv("KDOCS_SESSION_SECRET")
+    os.Getenv("KDOCS_ENV")
+
+Instead
+Configuration struct
+
+type Config struct {
+	Addr string
+}
+
+Grows with the app 
+type Config struct {
+	Addr           string
+	DatabaseURL    string
+	SessionSecret  string
+	Environment    string
+}
+
+then
+config := Config{
+	Addr: ":8080",
+}

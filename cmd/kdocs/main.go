@@ -9,22 +9,25 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nicholas-karimi/kdocs/internal/config"
 	"github.com/nicholas-karimi/kdocs/internal/web"
 )
 
 func main() {
 
+	// read config
+	cfg := config.Load()
 	router := web.NewRouter()
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    cfg.Addr,
 		Handler: router,
 	}
 
 	serverErr := make(chan error, 1)
 
 	go func() {
-		fmt.Println("KDocs server starting on  http://localhost:8080")
+		fmt.Printf("KDocs server starting on  http://localhost%s\n", cfg.Addr)
 		serverErr <- server.ListenAndServe()
 	}()
 
