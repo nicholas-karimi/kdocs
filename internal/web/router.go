@@ -27,6 +27,11 @@ func NewRouter() (http.Handler, error) {
 
 	router := chi.NewRouter()
 
+	// load static files
+	fileServer := http.FileServer(http.Dir("./static"))
+
+	router.Handle("/static/*", http.StripPrefix("/static/", fileServer))
+
 	/* using closure
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		err := templates.ExecuteTemplate(w, "base", nil)

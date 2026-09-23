@@ -150,3 +150,21 @@ Return errors from startup
 Problem: diagnostics could be better
     ↓
 Standard Go logging
+
+
+
+Static assets
+in Go servered using FileServer
+
+Browser
+    │
+    │ /static/css/kdocs.css
+    ▼
+StripPrefix
+    │
+    │ /css/kdocs.css
+    ▼
+FileServer("./static")
+    │
+    ▼
+./static/css/kdocs.css
