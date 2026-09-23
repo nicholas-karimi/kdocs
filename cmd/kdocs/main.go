@@ -17,8 +17,12 @@ func main() {
 
 	// read config
 	cfg := config.Load()
-	router := web.NewRouter()
+	router, err := web.NewRouter()
 
+	if err != nil {
+		fmt.Println("Failed to initialize router:", err)
+		return
+	}
 	server := &http.Server{
 		Addr:    cfg.Addr,
 		Handler: router,

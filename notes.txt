@@ -86,3 +86,24 @@ then
 config := Config{
 	Addr: ":8080",
 }
+
+
+A closure is a function that can access variables from the surrounding function.
+
+gofmt - Go's standard code formatter. It automatically formats Go source code according to Go's standard formatting rules.
+> gofmt -w internal/web/router.go cmd/kdocs/main.go
+gofmt       → format Go code
+-w          → write the formatted result back to the files
+file1 file2 → format these files
+Without -w, gofmt would print the formatted version to the terminal instead of modifying the files.
+
+We Go devs loves it coz instead of arguing about
+tabs vs spaces
+brace placement
+line breaks
+import formatting
+
+the formatter settles it.
+
+shortcut
+gofmt -w .
