@@ -12,6 +12,11 @@ type Handler struct {
 	templates *template.Template
 }
 
+type HomeData struct {
+	Title       string
+	Description string
+}
+
 func NewRouter() (http.Handler, error) {
 	templates, err := template.ParseFiles(
 		"web/templates/layouts/base.html",
@@ -52,7 +57,12 @@ func NewRouter() (http.Handler, error) {
 }
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
-	err := h.templates.ExecuteTemplate(w, "base", nil)
+
+	data := HomeData{
+		Title:       "KDocs",
+		Description: "Internal Engineering Knowledge System",
+	}
+	err := h.templates.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, "unable to render page", http.StatusInternalServerError)
 	}
