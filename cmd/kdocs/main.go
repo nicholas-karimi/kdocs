@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,7 +20,7 @@ func main() {
 	router, err := web.NewRouter()
 
 	if err != nil {
-		fmt.Println("Failed to initialize router:", err)
+		log.Println("Failed to initialize router:", err)
 		return
 	}
 	server := &http.Server{
@@ -31,7 +31,7 @@ func main() {
 	serverErr := make(chan error, 1)
 
 	go func() {
-		fmt.Printf("KDocs server starting on  http://localhost%s\n", cfg.Addr)
+		log.Printf("KDocs server starting on  http://localhost%s\n", cfg.Addr)
 		serverErr <- server.ListenAndServe()
 	}()
 
@@ -40,17 +40,17 @@ func main() {
 
 	select {
 	case err := <-serverErr:
-		fmt.Println(err)
+		log.Println(err)
 
 	case <-shutdownSignal:
-		fmt.Println("Shutdown signal received")
+		log.Println("Shutdown signal received")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		fmt.Println("Graceful shutdown failed:", err)
+		log.Println("Graceful shutdown failed:", err)
 	}
 
 }

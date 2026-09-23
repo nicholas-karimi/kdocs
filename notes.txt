@@ -90,6 +90,13 @@ config := Config{
 
 A closure is a function that can access variables from the surrounding function.
 
+template collection
+A parsed collection of templates that we can execute repeatedly.
+instead of 
+template.ParseFiles(...)
+inside every request, we have
+templates, err := template.ParseFiles(...)
+
 gofmt - Go's standard code formatter. It automatically formats Go source code according to Go's standard formatting rules.
 > gofmt -w internal/web/router.go cmd/kdocs/main.go
 gofmt       → format Go code
@@ -107,3 +114,39 @@ the formatter settles it.
 
 shortcut
 gofmt -w .
+
+Logging
+
+             Error
+               │
+        ┌──────┴──────┐
+        │             │
+     Developer       User
+        │             │
+   detailed log    safe response
+
+Terminal
+  template: home.html:7: unexpected "}"
+Browser
+500 Internal Server Error
+
+Concepts covered and problesm solved
+Templates
+    ↓
+Templates parsed per request
+    ↓
+Problem: repeated initialization
+    ↓
+Startup initialization
+    ↓
+Problem: handler needs access to templates
+    ↓
+Handler struct + receiver
+    ↓
+Problem: initialization errors were hidden
+    ↓
+Return errors from startup
+    ↓
+Problem: diagnostics could be better
+    ↓
+Standard Go logging
