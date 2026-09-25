@@ -172,4 +172,25 @@ FileServer("./static")
 
 
 Template Data
+make the layout receive data too
+type HomeData struct {
+    Title       string
+    Description string
+} - view/application data — data specifically needed to render the homepage.
 
+
+Domain Model
+A domain model is a Go type representing something meaningful in the application itself.
+
+Searching a slice
+Pages a relationship to Spaces
+
+Diagnosing superfluous response.WriteHeader
+- Go’s html/template package, a template collection is flat map. When you parse home.html, space.html, and page.html together into a single template tree using template.ParseFiles, the last file parsed overrides any previous definitions of "content".
+instead we use template sets 
+type Handler struct {
+	homeTemplate  *template.Template
+	spaceTemplate *template.Template
+	pageTemplate  *template.Template
+	// ... your other dependencies like databases/services
+}

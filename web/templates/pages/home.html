@@ -5,10 +5,31 @@
     <p class="lead">
         {{ .Description}}
     </p>
+    
     <p>
         Useful operational knowledge should be fast to find,
         easy to read, and easy to maintain.
     </p>
+
+    <h2>Spaces</h2>
+    <div class="row g-4">
+    {{ range .Spaces }}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h5">
+                        <a href="/spaces/{{ .Slug }}">{{ .Name }}</a>
+                        
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Engineering knowledge and documentation
+                    </p>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+</div>
 </div>
 
 {{ end }}

@@ -1,0 +1,22 @@
+{{ define "content" }}
+<div class="mb-4">
+    <h1>{{ .Space.Name }}</h1>
+
+    <p class="text-muted">
+        Engineering knowledge and documentation
+    </p>
+</div>
+
+<h2 class="h4 mb-3">Pages</h2>
+
+<div class="list-group">
+    {{ range .Pages }}
+        <a
+            href="/pages/{{ .Slug }}"
+            class="list-group-item list-group-item-action"
+        >
+            {{ .Title }}
+        </a>
+    {{ end }}
+</div>
+{{ end }}
