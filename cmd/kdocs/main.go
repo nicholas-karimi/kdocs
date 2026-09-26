@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/nicholas-karimi/kdocs/internal/config"
+	"github.com/nicholas-karimi/kdocs/internal/database"
 	"github.com/nicholas-karimi/kdocs/internal/web"
 )
 
@@ -17,7 +18,16 @@ func main() {
 
 	// read config
 	cfg := config.Load()
-	router, err := web.NewRouter()
+
+	// db
+	db, err := database.Open(cfg.DBDSN)
+	if err != nil {
+		log.Println("Failed to connect to database:", err)
+		return
+	}
+	defer db.Close()
+
+	router, err := web.NewRouter(db)
 
 	if err != nil {
 		log.Println("Failed to initialize router:", err)

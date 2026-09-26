@@ -1,14 +1,18 @@
 package web
 
 import (
+	"database/sql"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/nicholas-karimi/kdocs/internal/database"
 	"github.com/nicholas-karimi/kdocs/internal/domain"
 )
 
 type Handler struct {
+	db            *sql.DB
 	homeTemplate  *template.Template
 	spaceTemplate *template.Template
 	pageTemplate  *template.Template
@@ -26,7 +30,7 @@ type SpaceData struct {
 	Pages []domain.Page
 }
 
-func NewRouter() (http.Handler, error) {
+func NewRouter(db *sql.DB) (http.Handler, error) {
 	homeTemplate, err := template.ParseFiles(
 		"web/templates/layouts/base.html",
 		"web/templates/pages/home.html",
@@ -50,6 +54,7 @@ func NewRouter() (http.Handler, error) {
 	}
 
 	handler := &Handler{
+		db:            db,
 		homeTemplate:  homeTemplate,
 		pageTemplate:  pageTemplate,
 		spaceTemplate: spaceTemplate,
@@ -61,16 +66,6 @@ func NewRouter() (http.Handler, error) {
 	fileServer := http.FileServer(http.Dir("./static"))
 
 	router.Handle("/static/*", http.StripPrefix("/static/", fileServer))
-
-	/* using closure
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		err := templates.ExecuteTemplate(w, "base", nil)
-
-		if err != nil {
-			http.Error(w, "Unable to render page", http.StatusInternalServerError)
-			return
-		}
-	}) */
 
 	router.Get("/", handler.home)
 
@@ -89,68 +84,73 @@ func NewRouter() (http.Handler, error) {
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
 
+	spaces, err := database.FindSpaces(h.db)
+	if err != nil {
+		log.Println("Failed to find spaces:", nil)
+		http.Error(w, "Unable to load spaces", http.StatusInternalServerError)
+		return
+	}
 	data := HomeData{
 		Title:       "KDocs",
 		Description: "Internal Engineering Knowledge System",
-		Spaces:      domain.SampleSpaces(),
+		Spaces:      spaces,
 	}
-	err := h.homeTemplate.ExecuteTemplate(w, "base", data)
+	err = h.homeTemplate.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, "unable to render page", http.StatusInternalServerError)
 	}
 }
 
-/* func home(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(
-		"web/templates/layouts/base.html",
-		"web/templates/pages/hom.html",
-	)
-	if err != nil {
-		http.Error(w, "Unable to load page", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		http.Error(w, "Unable to render page", http.StatusInternalServerError)
-	}
-} */
-
-func (h *Handler) page(w http.ResponseWriter, r *http.Request) {
+// space
+func (h *Handler) space(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
-	page, found := domain.FindPage(slug)
+	space, found, err := database.FindSpace(h.db, slug)
+
+	if err != nil {
+		log.Println("Failed to find space:", err)
+		http.Error(w, "Unabe to load space", http.StatusInternalServerError)
+	}
 
 	if !found {
 		http.NotFound(w, r)
 		return
 	}
-	err := h.pageTemplate.ExecuteTemplate(w, "base", page)
+	pages, err := database.FindPagesBySpace(h.db, space.Slug)
+	if err != nil {
+		log.Println("Failed to find pages:", err)
+		http.Error(w, "Unable to load pages", http.StatusInternalServerError)
+		return
+	}
+	data := SpaceData{
+		Space: space,
+		Pages: pages,
+	}
+
+	err = h.spaceTemplate.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
 }
 
-func (h *Handler) space(w http.ResponseWriter, r *http.Request) {
+// page route
+
+func (h *Handler) page(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
-	space, found := domain.FindSpace(slug)
+	page, found, err := database.FindPage(h.db, slug)
+
+	if err != nil {
+		log.Println("Failed to find page:", err)
+		http.Error(w, "Unable to load page", http.StatusInternalServerError)
+		return
+	}
 
 	if !found {
 		http.NotFound(w, r)
 		return
 	}
-
-	data := SpaceData{
-		Space: space,
-		Pages: domain.FindPagesBySpace(space.Slug),
-	}
-	/* fmt.Fprintln(w, "Space:", data.Space.Name)
-
-	for _, page := range data.Pages {
-		fmt.Fprintln(w, "Page:", page.Title)
-	} */
-	err := h.spaceTemplate.ExecuteTemplate(w, "base", data)
+	err = h.pageTemplate.ExecuteTemplate(w, "base", page)
 	if err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}

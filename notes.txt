@@ -194,3 +194,16 @@ type Handler struct {
 	pageTemplate  *template.Template
 	// ... your other dependencies like databases/services
 }
+
+
+
+Database Persistence
+Topic(s)
+PostgreSQL connection
+database/sql
+SQL queries
+Query parameters
+sql.Rows
+Scanning database rows into Go structs
+Database initialization
+SQL schema
