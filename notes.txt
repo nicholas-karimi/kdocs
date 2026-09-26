@@ -207,3 +207,8 @@ sql.Rows
 Scanning database rows into Go structs
 Database initialization
 SQL schema
+Database integration tests  
+Migration tracking          
+Migration baseline          
+go test ./...               
+go vet ./...             
