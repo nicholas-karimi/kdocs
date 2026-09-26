@@ -212,3 +212,19 @@ Migration tracking
 Migration baseline          
 go test ./...               
 go vet ./...             
+
+
+
+
+
+Markdown rendering
+using Goldmark, a Go Markdown parser/renderer. It provides a direct Markdown → HTML pipeline and is commonly used in Go applications
+markdown is data, html is presentation
+
+[] Store Markdown in PostgreSQL — already working
+[] Convert Markdown → HTML
+[] Render headings, paragraphs, lists, emphasis, links, and fenced code blocks
+[] Display the rendered content correctly in the page UI
+[] Keep raw HTML from Markdown disabled for safety
+[] Have automated tests for the renderer
+[] Keep the renderer separate from the database and HTTP handler logic

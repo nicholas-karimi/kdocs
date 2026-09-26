@@ -1,12 +1,12 @@
 {{define "content"}}
     <div class="mb-4">
-        <h1>{{ .Title}}</h1>
+        <h1>{{ .Page.Title}}</h1>
     </div>
     <div class="card">
         <div class="card-body">
-            <p>
-                {{ .Content}}
-            </p>
+           
+                {{ .Page.Content}}
+           
         </div>
     </div>
 {{end}}

@@ -42,60 +42,55 @@ func TestFindSpace(t *testing.T) {
 	}
 }
 
-
 func TestFindSpaceNotFound(t *testing.T) {
-    db := testDB(t)
+	db := testDB(t)
 
-    _, found, err := FindSpace(db, "does-not-exist")
-    if err != nil {
-        t.Fatalf("FindSpace returned an error: %v", err)
-    }
+	_, found, err := FindSpace(db, "does-not-exist")
+	if err != nil {
+		t.Fatalf("FindSpace returned an error: %v", err)
+	}
 
-    if found {
-        t.Fatal("expected space not to be found")
-    }
+	if found {
+		t.Fatal("expected space not to be found")
+	}
 }
-
 
 func TestFindPagesBySpace(t *testing.T) {
-    db := testDB(t)
+	db := testDB(t)
 
-    pages, err := FindPagesBySpace(db, "databases")
-    if err != nil {
-        t.Fatalf("FindPagesBySpace returned an error: %v", err)
-    }
+	pages, err := FindPagesBySpace(db, "databases")
+	if err != nil {
+		t.Fatalf("FindPagesBySpace returned an error: %v", err)
+	}
 
-    if len(pages) != 2 {
-        t.Fatalf("expected 2 pages, got %d", len(pages))
-    }
+	if len(pages) != 2 {
+		t.Fatalf("expected 2 pages, got %d", len(pages))
+	}
 }
-
 
 func TestFindPage(t *testing.T) {
-    db := testDB(t)
+	db := testDB(t)
 
-    page, found, err := FindPage(db, "security-baseline")
-    if err != nil {
-        t.Fatalf("FindPage returned an error: %v", err)
-    }
+	page, found, err := FindPage(db, "security-baseline")
+	if err != nil {
+		t.Fatalf("FindPage returned an error: %v", err)
+	}
 
-    if !found {
-        t.Fatal("expected security-baseline page to be found")
-    }
+	if !found {
+		t.Fatal("expected security-baseline page to be found")
+	}
 
-    if page.Title != "Application Security Baseline" {
-        t.Errorf(
-            "expected Application Security Baseline, got %q",
-            page.Title,
-        )
-    }
+	if page.Title != "Application Security Baseline" {
+		t.Errorf(
+			"expected Application Security Baseline, got %q",
+			page.Title,
+		)
+	}
 
-    if page.SpaceSlug != "security" {
-        t.Errorf(
-            "expected security space, got %q",
-            page.SpaceSlug,
-        )
-    }
+	if page.SpaceSlug != "security" {
+		t.Errorf(
+			"expected security space, got %q",
+			page.SpaceSlug,
+		)
+	}
 }
-
-

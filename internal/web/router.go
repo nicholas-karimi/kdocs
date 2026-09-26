@@ -9,13 +9,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/nicholas-karimi/kdocs/internal/database"
 	"github.com/nicholas-karimi/kdocs/internal/domain"
+	"github.com/nicholas-karimi/kdocs/internal/markdown"
 )
 
 type Handler struct {
-	db            *sql.DB
-	homeTemplate  *template.Template
-	spaceTemplate *template.Template
-	pageTemplate  *template.Template
+	db               *sql.DB
+	homeTemplate     *template.Template
+	spaceTemplate    *template.Template
+	pageTemplate     *template.Template
+	markdownRenderer *markdown.Renderer
 }
 
 // view/application data — data specifically needed to render the homepage.
@@ -30,7 +32,16 @@ type SpaceData struct {
 	Pages []domain.Page
 }
 
+type PageData struct {
+	Page    domain.Page
+	Content template.HTML
+	Title   string
+}
+
 func NewRouter(db *sql.DB) (http.Handler, error) {
+
+	markdownRenderer := markdown.NewRenderer()
+
 	homeTemplate, err := template.ParseFiles(
 		"web/templates/layouts/base.html",
 		"web/templates/pages/home.html",
@@ -54,10 +65,11 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 	}
 
 	handler := &Handler{
-		db:            db,
-		homeTemplate:  homeTemplate,
-		pageTemplate:  pageTemplate,
-		spaceTemplate: spaceTemplate,
+		db:               db,
+		homeTemplate:     homeTemplate,
+		pageTemplate:     pageTemplate,
+		spaceTemplate:    spaceTemplate,
+		markdownRenderer: markdownRenderer,
 	}
 
 	router := chi.NewRouter()
@@ -150,8 +162,23 @@ func (h *Handler) page(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	err = h.pageTemplate.ExecuteTemplate(w, "base", page)
+
+	renderedContent, err := h.markdownRenderer.Render(page.Content)
 	if err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+		return
+	}
+	data := PageData{
+		Page:    page,
+		Content: template.HTML(renderedContent),
+		Title:   page.Title,
+	}
+	err = h.pageTemplate.ExecuteTemplate(w, "base", data)
+	// if err != nil {
+	// 	http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	// }
+	if err != nil {
+		log.Println("Failed to execute page template:", err)
+		return
 	}
 }
