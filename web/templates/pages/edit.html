@@ -1,0 +1,80 @@
+{{ define "content" }}
+
+<div class="mb-4">
+    <h1>Edit Page</h1>
+</div>
+
+<form method="POST" action="/pages/{{ .Page.Slug }}/edit">
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input
+            type="text"
+            id="title"
+            name="title"
+            class="form-control"
+            value="{{ .Page.Title }}"
+            required
+        >
+    </div>
+
+    <div class="mb-3">
+        <label for="slug" class="form-label">Slug</label>
+        <input
+            type="text"
+            id="slug"
+            name="slug"
+            class="form-control"
+            value="{{ .Page.Slug }}"
+            required
+        >
+    </div>
+
+    <div class="mb-3">
+        <label for="space_slug" class="form-label">Space</label>
+        <select
+            id="space_slug"
+            name="space_slug"
+            class="form-select"
+            required
+        >
+            {{ range .Spaces }}
+                <option
+                    value="{{ .Slug }}"
+                    {{ if eq .Slug $.Page.SpaceSlug }}selected{{ end }}
+                >
+                    {{ .Name }}
+                </option>
+            {{ end }}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="content" class="form-label">Content</label>
+        <textarea
+            id="content"
+            name="content"
+            class="form-control"
+            rows="20"
+            required
+        >{{ .Page.Content }}</textarea>
+
+        <div class="form-text">
+            Markdown is supported.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Save Changes
+    </button>
+
+    <a
+        href="/pages/{{ .Page.Slug }}"
+        class="btn btn-secondary"
+    >
+        Cancel
+    </a>
+
+</form>
+
+{{ end }}

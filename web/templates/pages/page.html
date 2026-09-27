@@ -1,6 +1,12 @@
 {{define "content"}}
     <div class="mb-4">
         <h1>{{ .Page.Title}}</h1>
+         <a
+        href="/pages/{{ .Page.Slug }}/edit"
+        class="btn btn-outline-primary"
+    >
+        Edit
+    </a>
     </div>
     <div class="card">
         <div class="card-body markdown-content">

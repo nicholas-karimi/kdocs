@@ -13,11 +13,12 @@ import (
 )
 
 type Handler struct {
-	db              *sql.DB
-	homeTemplate    *template.Template
-	spaceTemplate   *template.Template
-	pageTemplate    *template.Template
-	newPageTemplate *template.Template
+	db               *sql.DB
+	homeTemplate     *template.Template
+	spaceTemplate    *template.Template
+	pageTemplate     *template.Template
+	newPageTemplate  *template.Template
+	editPageTemplate *template.Template
 
 	markdownRenderer *markdown.Renderer
 }
@@ -76,12 +77,22 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 		return nil, err
 	}
 
-	handler := &Handler{
+	editPageTemplate, err := template.ParseFiles(
+		"web/templates/layouts/base.html",
+		"web/templates/pages/edit.html",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	h := &Handler{
 		db:               db,
 		homeTemplate:     homeTemplate,
 		pageTemplate:     pageTemplate,
 		spaceTemplate:    spaceTemplate,
 		newPageTemplate:  newPageTemplate,
+		editPageTemplate: editPageTemplate,
+
 		markdownRenderer: markdownRenderer,
 	}
 
@@ -92,23 +103,26 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 
 	router.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
-	router.Get("/", handler.home)
+	router.Get("/", h.home)
 
 	// route group
 	router.Route("/pages", func(r chi.Router) {
-		r.Get("/{slug}", handler.page)
+		r.Get("/{slug}", h.page)
 	})
 
 	// spaces
 	router.Route("/spaces", func(r chi.Router) {
-		r.Get("/{slug}", handler.space)
+		r.Get("/{slug}", h.space)
 	})
 
 	// new page
-	router.Get("/pages/new", handler.newPage)
+	router.Get("/pages/new", h.newPage)
 
 	//create page
-	router.Post("/pages", handler.createPage)
+	router.Post("/pages", h.createPage)
+
+	router.Get("/pages/{slug}/edit", h.editPage)
+	router.Post("/pages/{slug}/edit", h.updatePage)
 
 	return router, nil
 }
@@ -253,6 +267,85 @@ func (h *Handler) createPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Failed to create page:", err)
 		http.Error(w, "Unable to create page", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(
+		w,
+		r,
+		"/pages/"+slug,
+		http.StatusSeeOther,
+	)
+}
+
+func (h *Handler) editPage(w http.ResponseWriter, r *http.Request) {
+	slug := chi.URLParam(r, "slug")
+
+	page, found, err := database.FindPage(h.db, slug)
+
+	if err != nil {
+		log.Println("Failed to find page:", err)
+		http.Error(w, "Unable to load page", http.StatusInternalServerError)
+		return
+	}
+
+	if !found {
+		http.NotFound(w, r)
+		return
+	}
+
+	spaces, err := database.FindSpaces(h.db)
+	if err != nil {
+		log.Println("Failed to find spaces:", err)
+		http.Error(w, "Unable to load spaces", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Title  string
+		Page   domain.Page
+		Spaces []domain.Space
+	}{
+		Title:  "Edit " + page.Title,
+		Page:   page,
+		Spaces: spaces,
+	}
+
+	if err := h.editPageTemplate.ExecuteTemplate(w, "base", data); err != nil {
+		log.Println("Failed to execute edit page template:", err)
+	}
+}
+
+func (h *Handler) updatePage(w http.ResponseWriter, r *http.Request) {
+	originalSlug := chi.URLParam(r, "slug")
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form", http.StatusBadRequest)
+		return
+	}
+
+	title := r.FormValue("title")
+	slug := r.FormValue("slug")
+	spaceSlug := r.FormValue("space_slug")
+	content := r.FormValue("content")
+
+	if title == "" || slug == "" || spaceSlug == "" || content == "" {
+		http.Error(w, "All fields are required", http.StatusBadRequest)
+		return
+	}
+
+	err := database.UpdatePage(
+		h.db,
+		originalSlug,
+		title,
+		slug,
+		spaceSlug,
+		content,
+	)
+
+	if err != nil {
+		log.Println("Failed to update page:", err)
+		http.Error(w, "Unable to update page", http.StatusInternalServerError)
 		return
 	}
 

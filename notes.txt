@@ -248,3 +248,12 @@ copy-to-clipboard
 
 
 Forms-Create a Page
+
+
+
+
+Edit Page 
+[] HTML form reuse
+[] UPDATE SQL
+[] Path parameters
+[] Redirect-after-update
