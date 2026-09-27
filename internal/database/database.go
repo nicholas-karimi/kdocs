@@ -145,3 +145,25 @@ func FindSpaces(db *sql.DB) ([]domain.Space, error) {
 	}
 	return spaces, nil
 }
+
+
+
+func CreatePage(
+	db *sql.DB,
+	title string,
+	slug string,
+	spaceSlug string,
+	content string,
+) error {
+	_, err := db.Exec(
+		`
+		INSERT INTO pages (title, slug, space_slug, content)
+		VALUES ($1, $2, $3, $4)	
+		`,
+		title,
+		slug,
+		spaceSlug,
+		content,
+	)
+	return err
+}

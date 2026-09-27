@@ -1,3 +1,32 @@
 body {
     background: #f8f9fa;
 }
+
+.markdown-content pre {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.markdown-content pre code {
+    font-size: 0.9rem;
+}
+
+.markdown-content code {
+    font-size: 0.9em;
+}
+
+.markdown-content pre {
+    position: relative;
+}
+
+.code-block {
+    position: relative;
+}
+
+.code-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}

@@ -13,10 +13,12 @@ import (
 )
 
 type Handler struct {
-	db               *sql.DB
-	homeTemplate     *template.Template
-	spaceTemplate    *template.Template
-	pageTemplate     *template.Template
+	db              *sql.DB
+	homeTemplate    *template.Template
+	spaceTemplate   *template.Template
+	pageTemplate    *template.Template
+	newPageTemplate *template.Template
+
 	markdownRenderer *markdown.Renderer
 }
 
@@ -64,11 +66,22 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 		return nil, err
 	}
 
+	// add new page
+
+	newPageTemplate, err := template.ParseFiles(
+		"web/templates/layouts/base.html",
+		"web/templates/pages/new.html",
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	handler := &Handler{
 		db:               db,
 		homeTemplate:     homeTemplate,
 		pageTemplate:     pageTemplate,
 		spaceTemplate:    spaceTemplate,
+		newPageTemplate:  newPageTemplate,
 		markdownRenderer: markdownRenderer,
 	}
 
@@ -86,10 +99,16 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 		r.Get("/{slug}", handler.page)
 	})
 
-	//
+	// spaces
 	router.Route("/spaces", func(r chi.Router) {
 		r.Get("/{slug}", handler.space)
 	})
+
+	// new page
+	router.Get("/pages/new", handler.newPage)
+
+	//create page
+	router.Post("/pages", handler.createPage)
 
 	return router, nil
 }
@@ -168,6 +187,7 @@ func (h *Handler) page(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 		return
 	}
+	log.Printf("RENDERED HTML:\n%s", renderedContent)
 	data := PageData{
 		Page:    page,
 		Content: template.HTML(renderedContent),
@@ -181,4 +201,65 @@ func (h *Handler) page(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed to execute page template:", err)
 		return
 	}
+}
+
+// create new page
+func (h *Handler) newPage(w http.ResponseWriter, r *http.Request) {
+	spaces, err := database.FindSpaces(h.db)
+	if err != nil {
+		log.Println("Failed to find spaces:", err)
+		http.Error(w, "Unable to load page form", http.StatusInternalServerError)
+		return
+	}
+
+	// anonymous newpagestruct-since data structure only resides here
+	data := struct {
+		Title  string
+		Spaces []domain.Space
+	}{
+		Title:  "Create Page",
+		Spaces: spaces,
+	}
+
+	if err := h.newPageTemplate.ExecuteTemplate(w, "base", data); err != nil {
+		log.Println("Failed to execute new page template:", err)
+	}
+}
+
+func (h *Handler) createPage(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form", http.StatusBadRequest)
+		return
+	}
+	title := r.FormValue("title")
+	slug := r.FormValue("slug")
+	spaceSlug := r.FormValue("space_slug")
+	content := r.FormValue("content")
+
+	if title == "" || slug == "" || spaceSlug == "" || content == "" {
+		http.Error(w, "All fields are required", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("CONTENT RECEIVED:\n%s", content)
+	err := database.CreatePage(
+		h.db,
+		title,
+		slug,
+		spaceSlug,
+		content,
+	)
+
+	if err != nil {
+		log.Println("Failed to create page:", err)
+		http.Error(w, "Unable to create page", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(
+		w,
+		r,
+		"/pages/"+slug,
+		http.StatusSeeOther,
+	)
 }

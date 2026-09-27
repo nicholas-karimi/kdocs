@@ -228,3 +228,23 @@ markdown is data, html is presentation
 [] Keep raw HTML from Markdown disabled for safety
 [] Have automated tests for the renderer
 [] Keep the renderer separate from the database and HTTP handler logic
+
+
+
+
+code blocks
+Markdown
+   ↓
+Goldmark
+   ↓
+HTML
+   ↓
+Bootstrap styling
+   ↓
+code blocks
+   ↓
+copy-to-clipboard
+
+
+
+Forms-Create a Page
