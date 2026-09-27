@@ -1,12 +1,28 @@
 {{define "content"}}
-    <div class="mb-4">
-        <h1>{{ .Page.Title}}</h1>
-         <a
-        href="/pages/{{ .Page.Slug }}/edit"
-        class="btn btn-outline-primary"
-    >
-        Edit
-    </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>{{ .Page.Title }}</h1>
+
+    <div class="d-flex gap-2">
+        <a
+            href="/pages/{{ .Page.Slug }}/edit"
+            class="btn btn-outline-primary"
+        >
+            Edit
+        </a>
+
+        <form
+            method="POST"
+            action="/pages/{{ .Page.Slug }}/delete"
+            onsubmit="return confirm('Delete this page?');"
+        >
+            <button
+                type="submit"
+                class="btn btn-outline-danger"
+            >
+                Delete
+            </button>
+        </form>
+    </div>
     </div>
     <div class="card">
         <div class="card-body markdown-content">

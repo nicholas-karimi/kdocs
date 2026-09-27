@@ -192,3 +192,14 @@ func UpdatePage(
 
 	return err
 }
+
+func DeletePage(db *sql.DB, slug string) error {
+	_, err := db.Exec(
+		`
+		DELETE FROM pages 
+		WHERE slug = $1
+		`,
+		slug,
+	)
+	return err
+}

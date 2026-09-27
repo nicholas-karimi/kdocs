@@ -257,3 +257,17 @@ Edit Page
 [] UPDATE SQL
 [] Path parameters
 [] Redirect-after-update
+
+
+HTTP DELETE vs HTML forms
+FindPage()
+    → SELECT
+
+CreatePage()
+    → INSERT
+
+UpdatePage()
+    → UPDATE
+
+DeletePage()
+    → DELETE

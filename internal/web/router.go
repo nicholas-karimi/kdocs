@@ -124,6 +124,9 @@ func NewRouter(db *sql.DB) (http.Handler, error) {
 	router.Get("/pages/{slug}/edit", h.editPage)
 	router.Post("/pages/{slug}/edit", h.updatePage)
 
+	// delete
+	router.Post("/pages/{slug}/delete", h.deletePage)
+
 	return router, nil
 }
 
@@ -355,4 +358,25 @@ func (h *Handler) updatePage(w http.ResponseWriter, r *http.Request) {
 		"/pages/"+slug,
 		http.StatusSeeOther,
 	)
+}
+
+// delete page
+func (h *Handler) deletePage(w http.ResponseWriter, r *http.Request) {
+	slug := chi.URLParam(r, "slug")
+
+	err := database.DeletePage(h.db, slug)
+
+	if err != nil {
+		log.Println("Failed to delete page:", err)
+		http.Error(w, "Unable to delete page", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(
+		w,
+		r,
+		"/",
+		http.StatusSeeOther,
+	)
+
 }
