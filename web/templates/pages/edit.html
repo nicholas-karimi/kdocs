@@ -1,8 +1,28 @@
 {{ define "content" }}
 
-<div class="mb-4">
-    <h1>Edit Page</h1>
-</div>
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/">Home</a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a href="/spaces/{{ .Page.SpaceSlug }}">
+                {{ .Page.SpaceSlug }}
+            </a>
+        </li>
+
+        <li class="breadcrumb-item">
+            <a href="/pages/{{ .Page.Slug }}">
+                {{ .Page.Title }}
+            </a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+            Edit
+        </li>
+    </ol>
+</nav>
 
 <form method="POST" action="/pages/{{ .Page.Slug }}/edit">
 

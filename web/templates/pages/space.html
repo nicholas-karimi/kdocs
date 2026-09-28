@@ -1,13 +1,31 @@
 {{ define "content" }}
-<div class="mb-4">
-    <h1>{{ .Space.Name }}</h1>
 
-    <p class="text-muted">
-        Engineering knowledge and documentation
-    </p>
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/">Home</a>
+        </li>
+
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ .Space.Name }}
+        </li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>{{ .Space.Name }}</h1>
+        <p class="text-muted mb-0">
+            Pages in this space.
+        </p>
+    </div>
+
+    <a href="/pages/new" class="btn btn-primary">
+        New Page
+    </a>
 </div>
 
-<h2 class="h4 mb-3">Pages</h2>
+{{ if .Pages }}
 
 <div class="list-group">
     {{ range .Pages }}
@@ -15,8 +33,30 @@
             href="/pages/{{ .Slug }}"
             class="list-group-item list-group-item-action"
         >
-            {{ .Title }}
+            <div class="d-flex justify-content-between align-items-center">
+                <span>{{ .Title }}</span>
+                <span class="text-muted small">
+                    View
+                </span>
+            </div>
         </a>
     {{ end }}
 </div>
+
+{{ else }}
+
+<div class="text-center py-5">
+    <h2 class="h5">No pages yet</h2>
+
+    <p class="text-muted">
+        This space does not contain any pages yet.
+    </p>
+
+    <a href="/pages/new" class="btn btn-primary">
+        Create the first page
+    </a>
+</div>
+
+{{ end }}
+
 {{ end }}

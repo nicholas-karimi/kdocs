@@ -15,13 +15,23 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                KDocs
+   <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            KDocs
+        </a>
+
+        <div>
+            <a href="/" class="btn btn-outline-light btn-sm">
+                Home
+            </a>
+
+            <a href="/pages/new" class="btn btn-primary btn-sm">
+                New Page
             </a>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main class="container py-4">
         {{ template "content" . }}

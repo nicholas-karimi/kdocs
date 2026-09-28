@@ -1,3 +1,6 @@
+Phase 1 
+------------------ CRUD ----------------------------
+
 Application Configuration
 > Configuration is information that controls how the application runs, rather than the application's actual business logic.
 
@@ -271,3 +274,19 @@ UpdatePage()
 
 DeletePage()
     → DELETE
+
+
+-------------------------End of CRUD-------------------
+
+Phase 2
+
+[ ] KDocs navigation & UX
+[ ] Space → Pages → Page navigation
+[ ] breadcrumbs
+[ ] useful navigation links
+[ ] empty states
+[ ] Create/Edit/Delete flow UX
+[ ] page discovery
+
+Navigation as application state - a page isnt just displaying data. it also needs to tell the user - where iam 
+and where i can go from here.

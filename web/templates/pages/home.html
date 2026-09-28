@@ -1,35 +1,44 @@
 {{ define "content" }}
-<div class="py-5">
-    <h1>{{ .Title}}</h1>
 
-    <p class="lead">
-        {{ .Description}}
-    </p>
-    
-    <p>
-        Useful operational knowledge should be fast to find,
-        easy to read, and easy to maintain.
-    </p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>KDocs</h1>
+        <p class="text-muted mb-0">
+            Internal engineering knowledge and documentation.
+        </p>
+    </div>
 
-    <h2>Spaces</h2>
-    <div class="row g-4">
+    <a href="/pages/new" class="btn btn-primary">
+        New Page
+    </a>
+</div>
+
+<h2 class="h4 mb-3">Spaces</h2>
+
+<div class="row g-4">
     {{ range .Spaces }}
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-body">
                     <h3 class="h5">
-                        <a href="/spaces/{{ .Slug }}">{{ .Name }}</a>
-                        
+                        <a
+                            href="/spaces/{{ .Slug }}"
+                            class="text-decoration-none"
+                        >
+                            {{ .Name }}
+                        </a>
                     </h3>
 
-                    <p class="text-muted mb-0">
-                        Engineering knowledge and documentation
-                    </p>
+                    <a
+                        href="/spaces/{{ .Slug }}"
+                        class="btn btn-outline-primary btn-sm"
+                    >
+                        View Space
+                    </a>
                 </div>
             </div>
         </div>
     {{ end }}
-</div>
 </div>
 
 {{ end }}
